@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>India Live Weather</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+     WEATHER BACKGROUND
+===================================================== -->
+
+    <div id="weatherBackground">
+
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+
+        <div id="rainEffect"></div>
+
+        <div id="stars"></div>
+
+    </div>
+    <div id="lightning"></div>
+
+
+
+    <!-- =====================================================
+     APP
+===================================================== -->
+
+    <div class="weather-app">
+
+
+        <!-- =================================================
+         HEADER
+    ================================================== -->
+
+        <header class="top-header">
+
+
+            <!-- BRAND -->
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🌦️
+                </div>
+
+                <div>
+
+                    <h1>
+                        India Live Weather
+                    </h1>
+
+                    <p>
+                        Real-time weather information
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SEARCH -->
+
+            <div class="search-area">
+
+                <div class="search-box">
+
+                    <input type="text" id="cityInput" placeholder="Search village, town, city or district..."
+                        autocomplete="off">
+
+                    <button id="searchBtn">
+                        🔍 Search
+                    </button>
+
+                </div>
+
+
+                <div id="suggestionList" class="suggestion-list">
+                </div>
+
+
+                <button id="locationBtn" class="location-btn">
+
+                    📍 Use My Location
+
+                </button>
+
+            </div>
+
+
+
+            <!-- TIME -->
+
+            <div class="header-time">
+
+                <div id="currentDate">
+                    Loading date...
+                </div>
+
+                <strong id="currentTime">
+                    --:--:--
+                </strong>
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================================
+         ERROR
+    ================================================== -->
+
+        <div id="errorMsg" class="error-message">
+        </div>
+
+
+
+        <!-- =================================================
+         MAIN
+    ================================================== -->
+
+        <main>
+
+
+            <!-- =================================================
+             CURRENT WEATHER
+        ================================================== -->
+
+            <section class="current-weather">
+
+
+                <!-- LOCATION -->
+
+                <div class="location-info">
+
+                    <h2 id="locationName">
+                        📍 Detecting your location...
+                    </h2>
+
+                    <p id="locationAddress">
+                        Please allow location permission
+                    </p>
+
+                </div>
+
+
+
+                <!-- WEATHER MAIN -->
+
+                <div class="weather-main">
+
+
+                    <div class="weather-icon">
+
+                        <span id="weatherIcon">
+                            🌤️
+                        </span>
+
+                    </div>
+
+
+                    <div class="temperature-area">
+
+                        <div class="temperature">
+
+                            <span id="temperature">
+                                --
+                            </span>
+
+                            <span>
+                                °C
+                            </span>
+
+                        </div>
+
+
+                        <div id="weatherCondition" class="weather-condition">
+
+                            Loading weather...
+
+                        </div>
+
+
+                        <div class="feels-like">
+
+                            Feels like
+
+                            <strong id="feelsLike">
+                                --°C
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                 DETAILS
+            ================================================== -->
+
+                <div class="weather-details">
+
+
+                    <div class="weather-detail">
+
+                        <span>💧</span>
+
+                        <div>
+
+                            <small>
+                                Humidity
+                            </small>
+
+                            <strong id="humidity">
+                                --%
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-detail">
+
+                        <span>🌧️</span>
+
+                        <div>
+
+                            <small>
+                                Rain
+                            </small>
+
+                            <strong id="rainValue">
+                                -- mm
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-detail">
+
+                        <span>☁️</span>
+
+                        <div>
+
+                            <small>
+                                Cloud Cover
+                            </small>
+
+                            <strong id="cloudCover">
+                                --%
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-detail">
+
+                        <span>💨</span>
+
+                        <div>
+
+                            <small>
+                                Wind
+                            </small>
+
+                            <strong id="windSpeed">
+                                -- km/h
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-detail">
+
+                        <span>🧭</span>
+
+                        <div>
+
+                            <small>
+                                Direction
+                            </small>
+
+                            <strong id="windDirection">
+                                --°
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-detail">
+
+                        <span>☔</span>
+
+                        <div>
+
+                            <small>
+                                Rain Chance
+                            </small>
+
+                            <strong id="rainChance">
+                                --%
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-detail">
+
+                        <span>🌅</span>
+
+                        <div>
+
+                            <small>
+                                Sunrise
+                            </small>
+
+                            <strong id="sunrise">
+                                --
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-detail">
+
+                        <span>🌇</span>
+
+                        <div>
+
+                            <small>
+                                Sunset
+                            </small>
+
+                            <strong id="sunset">
+                                --
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =================================================
+             TRAVEL STATUS
+        ================================================== -->
+
+            <section class="travel-section">
+
+
+                <div id="travelIcon" class="travel-icon">
+
+                    🟢
+
+                </div>
+
+
+                <div>
+
+                    <h3 id="travelTitle">
+                        Travel Conditions
+                    </h3>
+
+                    <p id="travelMessage">
+                        Checking weather conditions...
+                    </p>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =================================================
+             7 DAY FORECAST
+        ================================================== -->
+
+            <section class="forecast-section">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h2>
+                            📅 7-Day Forecast
+                        </h2>
+
+                        <p id="forecastLocation">
+                            Current location
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div id="forecastContainer" class="forecast-container">
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =================================================
+             MAP
+        ================================================== -->
+
+            <section class="map-section">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h2>
+                            🗺️ Live Weather Map
+                        </h2>
+
+                        <p id="mapLocationName">
+                            Detecting location...
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div id="map"></div>
+
+
+            </section>
+
+
+        </main>
+
+
+
+        <!-- =================================================
+         FOOTER
+    ================================================== -->
+
+        <footer>
+
+            <h3>
+                🌦️ India Live Weather
+            </h3>
+
+            <p>
+                Real-time weather information
+                for locations across India.
+            </p>
+
+            <small>
+                Weather data powered by Open-Meteo
+                & OpenStreetMap
+            </small>
+
+        </footer>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+     LEAFLET MAP JS
+===================================================== -->
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+
+    <!-- =====================================================
+     MAIN JS
+===================================================== -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>

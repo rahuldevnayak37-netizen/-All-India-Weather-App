@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+
+    <title>India Live Weather</title>
+    <meta name="description" content="Live weather, forecasts, air quality and weather radar across India.">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+
+<body>
+
+    <!-- WEATHER BACKGROUND -->
+    <div id="weatherBackground">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div id="rainEffect"></div>
+        <div id="stars"></div>
+    </div>
+
+    <div id="lightning"></div>
+
+    <!-- APP -->
+    <div class="weather-app">
+
+        <!-- HEADER -->
+        <header class="top-header">
+
+            <div class="brand">
+                <div class="brand-icon">🌦️</div>
+                <div>
+                    <h1>India Live Weather</h1>
+                    <p>Real-time weather information</p>
+                </div>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="search-area">
+
+                <div class="search-box">
+                    <input type="text" id="cityInput" placeholder="Search village, town, city or district..."
+                        autocomplete="off">
+
+                    <button id="searchBtn" type="button">
+                        🔍 Search
+                    </button>
+                </div>
+
+                <div id="suggestionList" class="suggestion-list"></div>
+
+                <button id="locationBtn" class="location-btn" type="button">
+                    📍 Use My Location
+                </button>
+
+            </div>
+
+            <!-- CLOCK -->
+            <div class="header-time">
+                <div id="currentDate">Loading date...</div>
+                <strong id="currentTime">--:--:--</strong>
+            </div>
+
+        </header>
+
+        <!-- ERROR -->
+        <div id="errorMsg" class="error-message"></div>
+
+        <!-- MAIN -->
+        <main>
+
+            <!-- CURRENT WEATHER -->
+            <section class="current-weather">
+
+                <div class="location-info">
+                    <h2 id="locationName">📍 Detecting your location...</h2>
+                    <p id="locationAddress">Please allow location permission</p>
+                </div>
+
+                <!-- WEATHER -->
+                <div class="weather-main">
+
+                    <div class="weather-icon">
+                        <span id="weatherIcon">🌤️</span>
+                    </div>
+
+                    <div class="temperature-area">
+
+                        <div class="temperature">
+                            <span id="temperature">--</span>
+                            <span>°C</span>
+                        </div>
+
+                        <div id="weatherCondition" class="weather-condition">
+                            Loading weather...
+                        </div>
+
+                        <div class="feels-like">
+                            Feels like
+                            <strong id="feelsLike">--°C</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- WEATHER DETAILS -->
+                <div class="weather-details">
+
+                    <div class="weather-detail">
+                        <span>💧</span>
+                        <div>
+                            <small>Humidity</small>
+                            <strong id="humidity">--%</strong>
+                        </div>
+                    </div>
+
+                    <div class="weather-detail">
+                        <span>🌧️</span>
+                        <div>
+                            <small>Rain</small>
+                            <strong id="rainValue">-- mm</strong>
+                        </div>
+                    </div>
+
+                    <div class="weather-detail">
+                        <span>☁️</span>
+                        <div>
+                            <small>Cloud Cover</small>
+                            <strong id="cloudCover">--%</strong>
+                        </div>
+                    </div>
+
+                    <div class="weather-detail">
+                        <span>💨</span>
+                        <div>
+                            <small>Wind</small>
+                            <strong id="windSpeed">-- km/h</strong>
+                        </div>
+                    </div>
+
+                    <div class="weather-detail">
+                        <span>🧭</span>
+                        <div>
+                            <small>Direction</small>
+                            <strong id="windDirection">--°</strong>
+                        </div>
+                    </div>
+
+                    <div class="weather-detail">
+                        <span>☔</span>
+                        <div>
+                            <small>Rain Chance</small>
+                            <strong id="rainChance">--%</strong>
+                        </div>
+                    </div>
+
+                    <div class="weather-detail">
+                        <span>🌅</span>
+                        <div>
+                            <small>Sunrise</small>
+                            <strong id="sunrise">--</strong>
+                        </div>
+                    </div>
+
+                    <div class="weather-detail">
+                        <span>🌇</span>
+                        <div>
+                            <small>Sunset</small>
+                            <strong id="sunset">--</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- TRAVEL STATUS -->
+            <section class="travel-section">
+
+                <div id="travelIcon" class="travel-icon">🟢</div>
+
+                <div>
+                    <h3 id="travelTitle">Travel Conditions</h3>
+                    <p id="travelMessage">Checking weather conditions...</p>
+                </div>
+
+            </section>
+
+            <!-- FORECAST -->
+            <section class="forecast-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>📅 7-Day Forecast</h2>
+                        <p id="forecastLocation">Current location</p>
+                    </div>
+                </div>
+
+                <div id="forecastContainer" class="forecast-container"></div>
+
+            </section>
+
+            <!-- AIR QUALITY -->
+            <section class="air-quality-section" id="airQualitySection">
+
+                <div class="aqi-header">
+
+                    <div class="aqi-heading">
+                        <span class="aqi-label">ENVIRONMENT MONITORING</span>
+                        <h2>Air Quality Index</h2>
+                        <p>Real-time air pollution and atmospheric quality</p>
+                    </div>
+
+                    <div class="aqi-location">
+
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+
+                            <path d="M20 10c0 5-8 12-8 12s-8-7-8-12a8 8 0 1 1 16 0Z" />
+                            <circle cx="12" cy="10" r="3" />
+
+                        </svg>
+
+                        <span id="aqiLocation">Waiting for location</span>
+
+                    </div>
+
+                </div>
+
+                <!-- AQI MAIN CARD -->
+                <div class="aqi-main-card" id="aqiMainCard">
+
+                    <div class="aqi-main-content">
+
+                        <div class="aqi-score-area">
+
+                            <span class="aqi-score-label">CURRENT AIR QUALITY</span>
+
+                            <div class="aqi-score" id="aqiValue">--</div>
+
+                            <div class="aqi-status" id="aqiStatus">
+                                Waiting for data
+                            </div>
+
+                            <p class="aqi-description" id="aqiDescription">
+                                Air quality information will appear here
+                                after live data is loaded.
+                            </p>
+
+                        </div>
+
+                        <!-- GAUGE -->
+                        <div class="aqi-visual">
+
+                            <div class="aqi-gauge" id="aqiGauge">
+
+                                <div class="aqi-gauge-inner">
+                                    <span class="aqi-gauge-label">AQI</span>
+                                    <span class="aqi-gauge-number" id="aqiGaugeValue">--</span>
+                                </div>
+
+                            </div>
+
+                            <span class="aqi-gauge-caption">
+                                Air Quality Score
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- AQI SCALE -->
+                    <div class="aqi-scale">
+
+                        <div class="aqi-scale-item">
+                            <span class="aqi-scale-dot aqi-good"></span>
+                            <span>Good</span>
+                        </div>
+
+                        <div class="aqi-scale-item">
+                            <span class="aqi-scale-dot aqi-moderate"></span>
+                            <span>Moderate</span>
+                        </div>
+
+                        <div class="aqi-scale-item">
+                            <span class="aqi-scale-dot aqi-sensitive"></span>
+                            <span>Poor</span>
+                        </div>
+
+                        <div class="aqi-scale-item">
+                            <span class="aqi-scale-dot aqi-unhealthy"></span>
+                            <span>Unhealthy</span>
+                        </div>
+
+                        <div class="aqi-scale-item">
+                            <span class="aqi-scale-dot aqi-severe"></span>
+                            <span>Severe</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- POLLUTANTS -->
+                <div class="pollutants-section">
+
+                    <div class="pollutants-heading">
+
+                        <div>
+                            <h3>Air Pollutants</h3>
+                            <p>Atmospheric pollutant concentration levels</p>
+                        </div>
+
+                        <span class="pollutants-unit">μg/m³</span>
+
+                    </div>
+
+                    <div class="pollutants-grid">
+
+                        <!-- PM2.5 -->
+                        <article class="pollutant-card" id="pm25Card">
+
+                            <div class="pollutant-card-top">
+                                <span class="pollutant-name">PM2.5</span>
+
+                                <span class="pollutant-icon">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                                        stroke-width="1.7">
+
+                                        <circle cx="7" cy="7" r="2" />
+                                        <circle cx="16" cy="5" r="1.5" />
+                                        <circle cx="12" cy="13" r="3" />
+                                        <circle cx="19" cy="15" r="2" />
+                                        <circle cx="5" cy="18" r="1.5" />
+
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <div class="pollutant-value" id="pm25Value">--</div>
+                            <span class="pollutant-unit">μg/m³</span>
+                            <div class="pollutant-status" id="pm25Status">Waiting</div>
+
+                        </article>
+
+                        <!-- PM10 -->
+                        <article class="pollutant-card" id="pm10Card">
+
+                            <div class="pollutant-card-top">
+                                <span class="pollutant-name">PM10</span>
+
+                                <span class="pollutant-icon">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                                        stroke-width="1.7">
+
+                                        <circle cx="7" cy="7" r="2" />
+                                        <circle cx="16" cy="5" r="1.5" />
+                                        <circle cx="12" cy="13" r="3" />
+                                        <circle cx="19" cy="15" r="2" />
+                                        <circle cx="5" cy="18" r="1.5" />
+
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <div class="pollutant-value" id="pm10Value">--</div>
+                            <span class="pollutant-unit">μg/m³</span>
+                            <div class="pollutant-status" id="pm10Status">Waiting</div>
+
+                        </article>
+
+                        <!-- CO -->
+                        <article class="pollutant-card" id="coCard">
+
+                            <div class="pollutant-card-top">
+                                <span class="pollutant-name">Carbon Monoxide</span>
+                            </div>
+
+                            <div class="pollutant-value" id="coValue">--</div>
+                            <span class="pollutant-unit">μg/m³</span>
+                            <div class="pollutant-status" id="coStatus">Waiting</div>
+
+                        </article>
+
+                        <!-- NO2 -->
+                        <article class="pollutant-card" id="no2Card">
+
+                            <div class="pollutant-card-top">
+                                <span class="pollutant-name">Nitrogen Dioxide</span>
+                            </div>
+
+                            <div class="pollutant-value" id="no2Value">--</div>
+                            <span class="pollutant-unit">μg/m³</span>
+                            <div class="pollutant-status" id="no2Status">Waiting</div>
+
+                        </article>
+
+                        <!-- SO2 -->
+                        <article class="pollutant-card" id="so2Card">
+
+                            <div class="pollutant-card-top">
+                                <span class="pollutant-name">Sulphur Dioxide</span>
+                            </div>
+
+                            <div class="pollutant-value" id="so2Value">--</div>
+                            <span class="pollutant-unit">μg/m³</span>
+                            <div class="pollutant-status" id="so2Status">Waiting</div>
+
+                        </article>
+
+                        <!-- O3 -->
+                        <article class="pollutant-card" id="o3Card">
+
+                            <div class="pollutant-card-top">
+                                <span class="pollutant-name">Ozone</span>
+                            </div>
+
+                            <div class="pollutant-value" id="o3Value">--</div>
+                            <span class="pollutant-unit">μg/m³</span>
+                            <div class="pollutant-status" id="o3Status">Waiting</div>
+
+                        </article>
+
+                    </div>
+
+                </div>
+
+                <!-- HEALTH ADVISORY -->
+                <div class="aqi-health-card" id="aqiHealthCard">
+
+                    <div class="aqi-health-icon">
+
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+
+                            <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" />
+                            <path d="m9 12 2 2 4-4" />
+
+                        </svg>
+
+                    </div>
+
+                    <div class="aqi-health-content">
+
+                        <span class="aqi-health-label">HEALTH ADVISORY</span>
+
+                        <h3 id="aqiHealthTitle">Air quality guidance</h3>
+
+                        <p id="aqiHealthMessage">
+                            Health recommendations will be displayed
+                            according to the live air quality data.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- DATA STATUS -->
+                <div class="aqi-footer-status">
+
+                    <span class="aqi-live-indicator"></span>
+
+                    <span id="aqiDataStatus">
+                        Waiting for live air quality data
+                    </span>
+
+                </div>
+
+            </section>
+
+            <!-- LIVE WEATHER MAP -->
+            <section class="map-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>🗺️ Live Weather Map</h2>
+                        <p id="mapLocationName">Detecting location...</p>
+                    </div>
+
+                </div>
+
+                <!-- MAP -->
+                <div id="map"></div>
+
+                <!-- RADAR VISIBILITY + OPACITY -->
+
+                <div class="radar-opacity-panel">
+
+                    <div class="radar-opacity-header">
+
+                        <div class="radar-opacity-title">
+                            <h3>Radar Overlay</h3>
+                            <p>Control radar visibility and transparency</p>
+                        </div>
+
+                        <label class="radar-toggle">
+
+                            <input type="checkbox" id="radarVisibility" checked>
+
+                            <span class="radar-toggle-slider"></span>
+
+                        </label>
+
+                    </div>
+
+                    <div class="radar-opacity-control">
+
+                        <div class="radar-opacity-labels">
+
+                            <label for="radarOpacity">
+                                Radar opacity
+                            </label>
+
+                            <strong id="radarOpacityValue">65%</strong>
+
+                        </div>
+
+                        <input type="range" id="radarOpacity" min="0" max="100" value="65" step="5">
+
+                        <div class="radar-opacity-scale">
+                            <span>Transparent</span>
+                            <span>Opaque</span>
+                        </div>
+
+                    </div>
+
+                </div>s
+
+                <!-- RADAR TIMELINE -->
+                <div class="radar-timeline-panel">
+
+                    <div class="radar-timeline-header">
+
+                        <div>
+                            <h3>Rain Radar Timeline</h3>
+                            <p>Explore recent precipitation movement</p>
+                        </div>
+
+                        <button id="radarPlayBtn" type="button">
+                            ▶ Play
+                        </button>
+
+                    </div>
+                    <!-- RADAR LEGEND -->
+
+                    <div class="radar-legend">
+
+                        <div class="radar-legend-title">
+                            <span class="radar-legend-indicator"></span>
+                            Rain Intensity
+                        </div>
+
+                        <div class="radar-legend-scale">
+
+                            <div class="radar-legend-item">
+                                <span class="radar-color" style="background:#94f5a5"></span>
+                                <span>Light</span>
+                            </div>
+
+                            <div class="radar-legend-item">
+                                <span class="radar-color" style="background:#38bdf8"></span>
+                                <span>Moderate</span>
+                            </div>
+
+                            <div class="radar-legend-item">
+                                <span class="radar-color" style="background:#2563eb"></span>
+                                <span>Heavy</span>
+                            </div>
+
+                            <div class="radar-legend-item">
+                                <span class="radar-color" style="background:#a855f7"></span>
+                                <span>Very Heavy</span>
+                            </div>
+
+                            <div class="radar-legend-item">
+                                <span class="radar-color" style="background:#ef4444"></span>
+                                <span>Extreme</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- TIMELINE -->
+                    <div class="radar-timeline-controls">
+
+                        <input type="range" id="radarTimeline" min="0" max="0" value="0" step="1">
+
+                        <div class="radar-timeline-labels">
+
+                            <span id="radarFrameTime">
+                                Radar timeline
+                            </span>
+
+                            <span>Past radar</span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- RADAR STATUS -->
+                    <div id="radarStatus" class="radar-status">
+                        Loading radar timeline...
+                    </div>
+
+                    <!-- CREDIT -->
+                    <div class="radar-credit">
+                        Weather radar data by
+                        <a href="https://www.rainviewer.com/" target="_blank" rel="noopener noreferrer">
+                            RainViewer
+                        </a>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer>
+
+            <h3>🌦️ India Live Weather</h3>
+
+            <p>
+                Real-time weather information
+                for locations across India.
+            </p>
+
+            <small>
+                Weather data powered by Open-Meteo,
+                Leaflet and OpenStreetMap.
+            </small>
+
+        </footer>
+
+    </div>
+
+    <!-- LEAFLET -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- MAIN SCRIPT -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
